@@ -59,3 +59,4 @@ exports.initialize = () => {
     fs.mkdirSync(exports.dataDir);
   }
 };
+
