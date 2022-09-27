@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
 
-var counter = 0;
 
 // Private helper functions ////////////////////////////////////////////////////
 
@@ -15,7 +14,6 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-console.log(zeroPaddedNumber(5));
 
 const readCounter = (callback) => {
   fs.readFile(exports.counterFile, (err, fileData) => {
