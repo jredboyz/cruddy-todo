@@ -9,12 +9,11 @@ const counter = require('./counter');
 exports.create = (text, callback) => {
   counter.getNextUniqueId((err, uniqueId) => {
     var id = uniqueId;
-    var newPath = path.join('test', 'testData', `${id}.txt`);
+    var newPath = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile(newPath, text, () => {
       callback(err, { id, text });
     });
   });
-  // var newPath = path.join(__dirname, 'data', `${id}.txt`);
   // var id = counter.getNextUniqueId();
   // items[id] = text;
   // callback(null, { id, text });
@@ -88,14 +87,30 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
-  var item = items[id];
-  delete items[id];
-  if (!item) {
-    // report an error if item not found
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback();
-  }
+  let deleted = false;
+  fs.readdir(exports.dataDir, (err, files) => {
+    for (let i = 0; i < files.length; i++) {
+      if (id === files[i].slice(0, files[i].length - 4)) {
+        deleted = true;
+        let currentFile = files[i];
+        let pathFile = path.join(exports.dataDir, currentFile);
+        fs.unlink(pathFile, (err) => {
+          callback(err);
+        });
+      }
+    }
+    if (!deleted) {
+      callback(new Error(`No item with id: ${id}`));
+    }
+  });
+  // var item = items[id];
+  // delete items[id];
+  // if (!item) {
+  //   // report an error if item not found
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   callback();
+  // }
 };
 
 // Config+Initialization code -- DO NOT MODIFY /////////////////////////////////
