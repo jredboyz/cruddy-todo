@@ -22,10 +22,20 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, (err, files) => {
+    var todos = _.map(files, (file) => {
+      fs.readFile(path.join(exports.dataDir, file), (err, data) => {
+        console.log(data, '_____________');
+        return { id: file, text: data.toString() }; // remove txt from id
+      });
+    });
+    console.log(todos);
+    callback(err, todos);
   });
-  callback(null, data);
+  // var data = _.map(items, (text, id) => {
+  //   return { id, text };
+  // });
+  // callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
