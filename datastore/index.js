@@ -35,6 +35,24 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
+  let found = false;
+  fs.readdir(exports.dataDir, (err, files) => {
+    for (let i = 0; i < files.length; i++) {
+      if (id === files[i].slice(0, 5)) {
+        found = true;
+        let currentFile = files[i];
+        let pathFile = path.join(exports.dataDir, currentFile);
+        let test = '';
+        fs.readFile(pathFile, 'utf8', (err, data) => {
+          var todo = { id: id, text: data };
+          callback(err, todo);
+        });
+      }
+    }
+    if (!found) {
+      callback(new Error(`No item with id: ${id}`));
+    }
+  });
   // var text = items[id];
   // if (!text) {
   //   callback(new Error(`No item with id: ${id}`));
