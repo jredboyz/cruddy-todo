@@ -23,7 +23,7 @@ exports.create = (text, callback) => {
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, files) => {
     var todos = files.map((file) => {
-      file = file.slice(0, 5);
+      file = file.slice(0, file.length - 4);
       return { id: file, text: file };
     });
     callback(err, todos);
@@ -38,11 +38,10 @@ exports.readOne = (id, callback) => {
   let found = false;
   fs.readdir(exports.dataDir, (err, files) => {
     for (let i = 0; i < files.length; i++) {
-      if (id === files[i].slice(0, 5)) {
+      if (id === files[i].slice(0, files[i].length - 4)) {
         found = true;
         let currentFile = files[i];
         let pathFile = path.join(exports.dataDir, currentFile);
-        let test = '';
         fs.readFile(pathFile, 'utf8', (err, data) => {
           var todo = { id: id, text: data };
           callback(err, todo);
@@ -62,13 +61,30 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  let updated = false;
+  fs.readdir(exports.dataDir, (err, files) => {
+    for (let i = 0; i < files.length; i++) {
+      if (id === files[i].slice(0, files[i].length - 4)) {
+        updated = true;
+        let currentFile = files[i];
+        let pathFile = path.join(exports.dataDir, currentFile);
+        fs.writeFile(pathFile, text, (err) => {
+          var todo = { id: id, text: text };
+          callback(err, todo);
+        });
+      }
+    }
+    if (!updated) {
+      callback(new Error(`No item with id: ${id}`));
+    }
+  });
+  // var item = items[id];
+  // if (!item) {
+  //   callback(new Error(`No item with id: ${id}`));
+  // } else {
+  //   items[id] = text;
+  //   callback(null, { id, text });
+  // }
 };
 
 exports.delete = (id, callback) => {
